@@ -19,7 +19,7 @@ class PanelAdmin extends StatelessWidget {
           children: [
             Icon(Icons.admin_panel_settings_outlined, color: Colors.amberAccent),
             SizedBox(width: 8),
-            Text('Panel Admin', style: TextStyle(color: Colors.white)),
+            Text('Panel Administrador', style: TextStyle(color: Colors.white)),
           ],
         ),
         actions: [
@@ -30,13 +30,6 @@ class PanelAdmin extends StatelessWidget {
           ),
         ],
         elevation: 0,
-      ),
-      body: const Center(
-        child: Text(
-          'Bienvenido al Panel del Administrador',
-          style: TextStyle(fontSize: 20, color: Colors.white70),
-          textAlign: TextAlign.center,
-        ),
       ),
     );
   }

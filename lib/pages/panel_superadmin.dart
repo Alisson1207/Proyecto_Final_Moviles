@@ -12,7 +12,7 @@ class PanelSuperadmin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Color(0xFFECEFF1),
       appBar: AppBar(
         backgroundColor: Colors.indigo.shade800,
         title: const Row(
@@ -30,13 +30,6 @@ class PanelSuperadmin extends StatelessWidget {
           ),
         ],
         elevation: 0,
-      ),
-      body: const Center(
-        child: Text(
-          'Bienvenido al Panel del Superadministrador',
-          style: TextStyle(fontSize: 20, color: Color(0xFF0A3D62)),
-          textAlign: TextAlign.center,
-        ),
       ),
     );
   }

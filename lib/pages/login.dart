@@ -65,7 +65,7 @@ class _IniciarSesionState extends State<IniciarSesion> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Icon(Icons.lock_outline, size: 72, color: Colors.white),
+                const Icon(Icons.lock_outline, size: 72, color: Colors.lightBlueAccent),
                 const SizedBox(height: 20),
                 Text(
                   'Iniciar Sesión',
