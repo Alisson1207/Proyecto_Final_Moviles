@@ -60,7 +60,7 @@ class _VerificarAutenticacionState extends State<VerificarAutenticacion>
 
       final rol = respuesta['rol'];
 
-      await Future.delayed(const Duration(seconds: 2)); // pequeña pausa visual
+      await Future.delayed(const Duration(seconds: 2)); 
 
       if (rol == 'topografo') {
         Navigator.pushReplacement(
@@ -100,7 +100,7 @@ class _VerificarAutenticacionState extends State<VerificarAutenticacion>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A), // azul oscuro elegante
+      backgroundColor: const Color(0xFF0F172A), 
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

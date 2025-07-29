@@ -94,7 +94,7 @@ class _IniciarSesionState extends State<IniciarSesion> {
                     prefixIcon: const Icon(Icons.lock, color: Colors.white70),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        mostrarPassword ? Icons.visibility : Icons.visibility_off, // ojo abierto si mostrar
+                        mostrarPassword ? Icons.visibility : Icons.visibility_off, 
                         color: Colors.white54,
                       ),
                       onPressed: () => setState(() => mostrarPassword = !mostrarPassword),
@@ -106,7 +106,7 @@ class _IniciarSesionState extends State<IniciarSesion> {
                 ElevatedButton.icon(
                   icon: const Icon(Icons.login),
                   onPressed: _login,
-                  label: const Text('Entrar', style: TextStyle(color: Colors.white)), // texto blanco
+                  label: const Text('Entrar', style: TextStyle(color: Colors.white)), 
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: Theme.of(context).colorScheme.primary,
