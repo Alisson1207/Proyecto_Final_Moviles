@@ -29,6 +29,6 @@ flutter:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/icono.png"  # Ruta a tu ícono cuadrado
+  image_path: "assets/icono.png"  
   min_sdk_android: 21
 
