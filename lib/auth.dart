@@ -10,8 +10,10 @@ class VerificarAutenticacion extends StatefulWidget {
   State<VerificarAutenticacion> createState() => _VerificarAutenticacionState();
 }
 
-class _VerificarAutenticacionState extends State<VerificarAutenticacion> {
-  bool _yaNavego = false; // Evita redirecciones múltiples
+class _VerificarAutenticacionState extends State<VerificarAutenticacion>
+    with SingleTickerProviderStateMixin {
+  bool _yaNavego = false;
+  String? _mensaje;
 
   @override
   void initState() {
@@ -45,6 +47,10 @@ class _VerificarAutenticacionState extends State<VerificarAutenticacion> {
       return;
     }
 
+    setState(() {
+      _mensaje = 'Bienvenido de nuevo 👋';
+    });
+
     try {
       final respuesta = await Supabase.instance.client
           .from('usuarios')
@@ -53,6 +59,8 @@ class _VerificarAutenticacionState extends State<VerificarAutenticacion> {
           .single();
 
       final rol = respuesta['rol'];
+
+      await Future.delayed(const Duration(seconds: 2)); // pequeña pausa visual
 
       if (rol == 'topografo') {
         Navigator.pushReplacement(
@@ -70,7 +78,6 @@ class _VerificarAutenticacionState extends State<VerificarAutenticacion> {
           MaterialPageRoute(builder: (_) => PanelSuperadmin()),
         );
       } else {
-        // Rol desconocido
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Rol desconocido: $rol')),
         );
@@ -80,7 +87,6 @@ class _VerificarAutenticacionState extends State<VerificarAutenticacion> {
         );
       }
     } catch (e) {
-      // Error al obtener el rol
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al verificar el rol')),
       );
@@ -94,14 +100,14 @@ class _VerificarAutenticacionState extends State<VerificarAutenticacion> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: const Color(0xFF0F172A), // azul oscuro elegante
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Icon(Icons.location_on, size: 90, color: Color(0xFF0EA5E9)),
-            SizedBox(height: 20),
-            Text(
+          children: [
+            const Icon(Icons.location_searching, size: 90, color: Color(0xFF38BDF8)),
+            const SizedBox(height: 20),
+            const Text(
               'GeoTrack App',
               style: TextStyle(
                 fontSize: 28,
@@ -109,8 +115,19 @@ class _VerificarAutenticacionState extends State<VerificarAutenticacion> {
                 color: Color(0xFF38BDF8),
               ),
             ),
-            SizedBox(height: 30),
-            CircularProgressIndicator(
+            if (_mensaje != null) ...[
+              const SizedBox(height: 12),
+              Text(
+                _mensaje!,
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 16,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
+            const SizedBox(height: 30),
+            const CircularProgressIndicator(
               color: Color(0xFF38BDF8),
               strokeWidth: 3,
             ),
