@@ -48,7 +48,6 @@ class _PanelAdminState extends State<PanelAdmin> {
   if (_ubicaciones.length < 3) return;
 
   final area = calcularArea(_ubicaciones);
-  print('Resultado de delete: $res');
   try {
 
     await Supabase.instance.client.from('terrenos_trazados').insert({
@@ -60,7 +59,7 @@ class _PanelAdminState extends State<PanelAdmin> {
     });
 
 
-    await Supabase.instance.client.from('ubicaciones').delete();
+    await Supabase.instance.client.from('ubicaciones').delete().neq('id', 0);
 
 
     setState(() {
@@ -80,8 +79,6 @@ class _PanelAdminState extends State<PanelAdmin> {
       );
     }
   } catch (e) {
-
-    print('Error: $e');
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
