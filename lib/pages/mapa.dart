@@ -14,22 +14,12 @@ class PantallaMapa extends StatefulWidget {
 
 class _PantallaMapaState extends State<PantallaMapa> {
   LatLng? _miUbicacion;
-  Map<String, LatLng> _usuarios = {};
   Stream<Position>? _posStream;
 
   @override
   void initState() {
     super.initState();
     iniciarStreamUbicacion();
-    SupabaseService.escucharUbicaciones((userId, latLng) {
-      // Filtrar mi propio usuario para evitar que aparezca duplicado
-      final usuarioActual = Supabase.instance.client.auth.currentUser;
-      if (usuarioActual != null && userId != usuarioActual.id) {
-        setState(() {
-          _usuarios[userId] = latLng;
-        });
-      }
-    });
   }
 
   void iniciarStreamUbicacion() async {
@@ -43,12 +33,55 @@ class _PantallaMapaState extends State<PantallaMapa> {
       ),
     );
 
-    _posStream!.listen((pos) async {
+    _posStream!.listen((pos) {
       setState(() {
         _miUbicacion = LatLng(pos.latitude, pos.longitude);
       });
-      await SupabaseService.enviarMiUbicacion(pos.latitude, pos.longitude);
     });
+  }
+
+  Future<void> _enviarUbicacionManual() async {
+    if (_miUbicacion == null) return;
+
+    final ok = await SupabaseService.enviarMiUbicacion(
+      _miUbicacion!.latitude,
+      _miUbicacion!.longitude,
+    );
+
+    if (ok) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              '✅ Ubicación enviada con éxito',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+            backgroundColor: Colors.green.shade600,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              '❌ Error al enviar ubicación',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.red.shade700,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _cerrarSesion(BuildContext context) async {
@@ -92,34 +125,8 @@ class _PantallaMapaState extends State<PantallaMapa> {
         point: _miUbicacion!,
         width: 40,
         height: 40,
-        child: TweenAnimationBuilder<LatLng>(
-          tween: Tween<LatLng>(
-            begin: _miUbicacion!,
-            end: _miUbicacion!,
-          ),
-          duration: const Duration(milliseconds: 500),
-          builder: (context, value, child) {
-            return const Icon(Icons.person_pin_circle, color: Colors.blue, size: 40);
-          },
-        ),
+        child: const Icon(Icons.person_pin_circle, color: Colors.blue, size: 40),
       ),
-      ..._usuarios.entries.map(
-        (entry) => Marker(
-          point: entry.value,
-          width: 40,
-          height: 40,
-          child: TweenAnimationBuilder<LatLng>(
-            tween: Tween<LatLng>(
-              begin: entry.value,
-              end: entry.value,
-            ),
-            duration: const Duration(milliseconds: 500),
-            builder: (context, value, child) {
-              return const Icon(Icons.location_on, color: Colors.red, size: 40);
-            },
-          ),
-        ),
-      )
     ];
 
     return Scaffold(
@@ -142,17 +149,44 @@ class _PantallaMapaState extends State<PantallaMapa> {
         ],
         elevation: 0,
       ),
-      body: FlutterMap(
-        options: MapOptions(
-          initialCenter: _miUbicacion!,
-          initialZoom: 15,
-        ),
+      body: Column(
         children: [
-          TileLayer(
-            urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-            subdomains: const ['a', 'b', 'c'],
+          Expanded(
+            child: FlutterMap(
+              options: MapOptions(
+                initialCenter: _miUbicacion!,
+                initialZoom: 15,
+              ),
+              children: [
+                TileLayer(
+                  urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                  subdomains: const ['a', 'b', 'c'],
+                ),
+                MarkerLayer(markers: marcadores),
+              ],
+            ),
           ),
-          MarkerLayer(markers: marcadores),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.lightBlueAccent.shade700,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: _enviarUbicacionManual,
+                icon: const Icon(Icons.send, color: Colors.white),
+                label: const Text(
+                  "Enviar Ubicación",
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
