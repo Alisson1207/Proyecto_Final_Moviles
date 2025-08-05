@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'UbicacionTopografos.dart';
+
 class PanelSuperadmin extends StatefulWidget {
   const PanelSuperadmin({super.key});
 
@@ -50,6 +51,160 @@ class _PanelSuperadminState extends State<PanelSuperadmin> {
     Navigator.pushReplacementNamed(context, '/');
   }
 
+  Future<void> _crearUsuario(String email, String password, String rol) async {
+    try {
+      final authResponse = await Supabase.instance.client.auth.signUp(
+        email: email,
+        password: password,
+      );
+
+      if (authResponse.user == null) {
+        throw Exception('No se pudo crear el usuario en autenticación');
+      }
+
+      final userId = authResponse.user!.id;
+
+      await Supabase.instance.client.from('usuarios').insert({
+        'id': userId,
+        'email': email,
+        'rol': rol,
+        'activo': true,
+      });
+
+      setState(() {
+        _usuarios = obtenerUsuarios();
+      });
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Usuario agregado correctamente')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al agregar usuario: $e')),
+      );
+    }
+  }
+
+  void _mostrarDialogoAgregarUsuario() {
+    final emailCtrl = TextEditingController();
+    final passwordCtrl = TextEditingController();
+    String rolSeleccionado = 'topografo'; 
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            'Agregar Usuario',
+            style: TextStyle(color: Colors.white),
+          ),
+          content: StatefulBuilder(
+            builder: (context, setStateDialog) {
+              return SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: emailCtrl,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        labelText: 'Email',
+                        labelStyle: TextStyle(color: Colors.white70),
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white54),
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                      ),
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                  const SizedBox(height: 12),
+                    TextField(
+                      controller: passwordCtrl,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        labelText: 'Contraseña',
+                        labelStyle: TextStyle(color: Colors.white70),
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white54),
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                      ),
+                      obscureText: true,
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      value: rolSeleccionado,
+                      items: [
+                        DropdownMenuItem(value: 'topografo', child: Text('Topógrafo', style: TextStyle(color: Colors.white))),
+                        DropdownMenuItem(value: 'admin', child: Text('Administrador', style: TextStyle(color: Colors.white))),
+                      ],
+                      onChanged: (val) {
+                        if (val != null) {
+                          setStateDialog(() {
+                            rolSeleccionado = val;
+                          });
+                        }
+                      },
+                      style: const TextStyle(color: Colors.white), 
+                      decoration: const InputDecoration(
+                        labelText: 'Rol',
+                        labelStyle: TextStyle(color: Colors.white70),
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white54),
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                      ),
+                    ),
+
+                  ],
+                ),
+              );
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final email = emailCtrl.text.trim();
+                final password = passwordCtrl.text.trim();
+
+                if (email.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('El email no puede estar vacío')),
+                  );
+                  return;
+                }
+                if (password.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('La contraseña no puede estar vacía')),
+                  );
+                  return;
+                }
+
+                Navigator.pop(context);
+                await _crearUsuario(email, password, rolSeleccionado);
+              },
+              child: const Text('Agregar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,10 +215,15 @@ class _PanelSuperadminState extends State<PanelSuperadmin> {
           children: [
             Icon(Icons.verified_user_rounded, color: Colors.amberAccent),
             SizedBox(width: 8),
-            Text('Panel Superadministrador', style: TextStyle(color: Colors.white)),
+            Text('Panel Superadmin', style: TextStyle(color: Colors.white)),
           ],
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.add, color: Colors.white),
+            tooltip: 'Agregar usuario',
+            onPressed: _mostrarDialogoAgregarUsuario,
+          ),
           IconButton(
             icon: const Icon(Icons.logout, color: Colors.white),
             tooltip: 'Cerrar sesión',
@@ -93,7 +253,9 @@ class _PanelSuperadminState extends State<PanelSuperadmin> {
 
           final usuarios = snapshot.data!;
           if (usuarios.isEmpty) {
-            return const Center(child: Text('No hay usuarios.', style: TextStyle(color: Colors.black54)));
+            return const Center(
+              child: Text('No hay usuarios.', style: TextStyle(color: Colors.black54)),
+            );
           }
 
           return ListView.builder(
