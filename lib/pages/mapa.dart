@@ -33,10 +33,16 @@ class _PantallaMapaState extends State<PantallaMapa> {
       ),
     );
 
-    _posStream!.listen((pos) {
+    _posStream!.listen((pos) async {
+      final nuevaUbicacion = LatLng(pos.latitude, pos.longitude);
+
       setState(() {
-        _miUbicacion = LatLng(pos.latitude, pos.longitude);
+        _miUbicacion = nuevaUbicacion;
       });
+      await SupabaseService.enviarUbicacionTiempoReal(
+        nuevaUbicacion.latitude,
+        nuevaUbicacion.longitude,
+      );
     });
   }
 

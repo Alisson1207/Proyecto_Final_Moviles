@@ -43,55 +43,62 @@ class _PanelAdminState extends State<PanelAdmin> {
     }
     return (area.abs() / 2) * 111000 * 111000;
   }
-
   Future<void> trazarTerreno() async {
-  if (_ubicaciones.length < 3) return;
+    if (_ubicaciones.length < 3) return;
 
-  final area = calcularArea(_ubicaciones);
-  try {
+    final area = calcularArea(_ubicaciones);
+    try {
+      final conteo = await Supabase.instance.client
+          .from('terrenos_trazados')
+          .select('id', const FetchOptions(count: CountOption.exact));
 
-    await Supabase.instance.client.from('terrenos_trazados').insert({
-      'nombre': 'Terreno ${DateTime.now().millisecondsSinceEpoch}',
-      'puntos': jsonEncode(
-          _ubicaciones.map((e) => {'lat': e.latitude, 'lng': e.longitude}).toList()),
-      'area': area,
-      'fecha': DateTime.now().toIso8601String(),
-    });
+      final total = conteo.count ?? 0;
+      final nuevoNombre = 'Terreno ${total + 1}';
 
-
-    await Supabase.instance.client.from('ubicaciones').delete().neq('id', 0);
-
-
-    setState(() {
-      _ubicaciones.clear();
-    });
-
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            '✅ Terreno trazado. Revise los terrenos guardados.',
-            style: const TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.green.shade700,
+      await Supabase.instance.client.from('terrenos_trazados').insert({
+        'nombre': nuevoNombre,
+        'puntos': jsonEncode(
+          _ubicaciones.map((e) => {'lat': e.latitude, 'lng': e.longitude}).toList(),
         ),
-      );
-    }
-  } catch (e) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            '❌ Error al trazar el terreno. Inténtalo de nuevo.',
-            style: const TextStyle(color: Colors.white),
+        'area': area,
+        'fecha': DateTime.now().toIso8601String(),
+      });
+
+      await Supabase.instance.client
+          .from('ubicaciones')
+          .delete()
+          .not('id', 'is', null);
+
+      setState(() {
+        _ubicaciones.clear();
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '✅ Terreno trazado como "$nuevoNombre". Revise los terrenos guardados.',
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.green.shade700,
           ),
-          backgroundColor: Colors.red.shade700,
-        ),
-      );
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '❌ Error al trazar el terreno. Inténtalo de nuevo.',
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.red.shade700,
+          ),
+        );
+      }
     }
   }
-}
+
 
   Future<void> _cerrarSesion(BuildContext context) async {
     await Supabase.instance.client.auth.signOut();
