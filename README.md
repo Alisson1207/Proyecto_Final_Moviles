@@ -64,7 +64,7 @@ Permitir el seguimiento en tiempo real de varios topógrafos para el mapeo de te
 
 [![Funcionalidad](https://img.shields.io/badge/Funcionalidad-red?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be)
 
-[![Disponible en Amazon Appstore](https://img.shields.io/badge/Disponible_en-Amazon_Appstore-FF9900?style=for-the-badge&logo=amazon&logoColor=white)](https://www.amazon.com/dp/B0FLF722X7/ref=sr_1_1?crid=2GQ0ZIURACEKA&dib=eyJ2IjoiMSJ9.q82V2_O35zz6ShipJ52J4w.l5uKDxAKNkCk92uAqY3KvW1XS_OIEKXDgTSy9i8nk14&dib_tag=se&keywords=GeoTrack&qid=1754520566&s=mobile-apps&sprefix=geotrack,mobile-apps,297&sr=1-1)
+[![Disponible en Amazon Appstore](https://img.shields.io/badge/Disponible_en-Amazon_Appstore-FF9900?style=for-the-badge&logo=amazon&logoColor=white)](https://www.amazon.com/gp/product/B0FLF722X7)
 
 
 
