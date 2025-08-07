@@ -62,7 +62,7 @@ Permitir el seguimiento en tiempo real de varios topógrafos para el mapeo de te
 
 ## 🔗 Links
 
-[![Funcionalidad](https://img.shields.io/badge/Funcionalidad-red?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be)
+[![Funcionalidad](https://img.shields.io/badge/Funcionalidad-red?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/V-qpMeYvJes)
 
 [![Disponible en Amazon Appstore](https://img.shields.io/badge/Disponible_en-Amazon_Appstore-FF9900?style=for-the-badge&logo=amazon&logoColor=white)](https://www.amazon.com/gp/product/B0FLF722X7)
 
